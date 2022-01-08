@@ -8,8 +8,8 @@ router.get('/', (req, res) => {
     res.send("Hello from server !");
 });
 
+// request body should be like this: {name, dateExp}
 router.post('/products', async (req, res) => {
-    console.log(req.body);
     const product = new Product(req.body);
 
     try {
@@ -33,6 +33,7 @@ router.post('/products', async (req, res) => {
     }
 })
 
+// To get all products
 router.get('/products', async (req, res) => {
     try {
         const produits = await Product.find({}).lean();
@@ -61,31 +62,31 @@ router.get('/products/:id', async (req,res) => {
 
 // Method: POST
 // The arduino card send a post request to the server in order to notify the user of a change in the temperature
+// depricated
+// router.post('/notifications/temperature', async (req, res) => {
+//     const {temperatureActuelle, differenceTemperature} = req.body;
+//     const notification = new Notification({notificationType: 'temperature'});
+//     try {
+//         await notification.save()
+//         res.status(201).send({ notification })
+//     } catch (e) {
+//         res.status(400).send(e)
+//     }
+// })
 
-router.post('/notifications/temperature', async (req, res) => {
-    const {temperatureActuelle, differenceTemperature} = req.body;
-    const notification = new Notification({notificationType: 'temperature'});
+// router.post('/notifications/expiration', async (req, res) => {
+//     const notification = new Notification({notificationType: 'expiration'});
+//     const expirationDate = req.body
 
-    try {
-        await notification.save()
-        res.status(201).send({ notification })
-    } catch (e) {
-        res.status(400).send(e)
-    }
-})
+//     try {
+//         await notification.save()
+//         res.status(201).send({ notification })
+//     } catch (e) {
+//         res.status(400).send(e)
+//     }
+// })
 
-router.post('/notifications/expiration', async (req, res) => {
-    const notification = new Notification({notificationType: 'expiration'});
-    const expirationDate = req.body
-
-    try {
-        await notification.save()
-        res.status(201).send({ notification })
-    } catch (e) {
-        res.status(400).send(e)
-    }
-})
-
+// To get all temperature notification
 router.get('/notifications/temperature', async (req, res) => {
     try {
         const notifications = await Notification.find({notificationType: 'temperature'}).lean();
@@ -95,6 +96,7 @@ router.get('/notifications/temperature', async (req, res) => {
     }
 })
 
+// To get all expiration notifications
 router.get('/notifications/expiration', async (req, res) => {
     try {
         const notifications = await Notification.find({notificationType: 'expiration'}).populate('product').lean();
@@ -104,6 +106,6 @@ router.get('/notifications/expiration', async (req, res) => {
     }
 })
 
-console.log("Hello from router.js")
+
 
 module.exports = router;
