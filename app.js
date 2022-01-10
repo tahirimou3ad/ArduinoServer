@@ -35,6 +35,7 @@ app.use(function (req, res, next) {
   next();
 });
 
+// On lance une socket liée au front end (http://localhost:3000) au port 3031
 const io = require('socket.io')(3031, {
   cors: {
       origin: 'http://localhost:3000',
@@ -56,6 +57,7 @@ app.listen(PORT, () => {
     console.log(`The server is now listening on port ${PORT} ... `);
 });
 
+// Depuis le server nodejs, SerialPort permet d'avoir accès a tout les données écrite sur le serial port de la carte arduino
 const SerialPort = require('serialport'); 
 const ReadLine = SerialPort.parsers.Readline;
 
@@ -70,13 +72,19 @@ parser.on('open', function () {
 
 parser.on('data', async (data) => { 
   if (data){
+    // On reçoit une temprature depuis l'arduino quand il y a une fluctuation > 2 C 
     const temperature = parseInt(data);
     console.log(temperature);
+
+    // On cree la notfication
     const notification = new Notification({notificationType: "temperature", temperature});
+   
+    // On genere les donnees pour la pop up au front end
     const description = `Temperature actuelle: ${temperature} `
-    req.app.io.emit('popup', {title: "Porte Ouverte !", description});
+    // On envoie les données concernant la popup
+    app.io.emit('popup', {title: "Porte Ouverte !", description});
     
-    // Send message to the UI
+    // On enregistre la notfication
     try {
         await notification.save();
 
